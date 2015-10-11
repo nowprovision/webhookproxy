@@ -47,16 +47,15 @@ is done, any Content-Type are fine, any arbitary payload should work, form urlen
 
 ## Self-Hosting and Deployment 
 
-The project webhookproxy-single is a very simple host, as suggested by the name it only supports one
-webhook configuration, which is kind of defeating the point if we do aim to avoid wasting time with endpoint
-setup.
+The project [webhookproxy-single](http://www.github.com/nowprovision/webhookproxy-single) is a very simple host, as suggested by the name it only supports one
+webhook configuration, which is kind of defeating the point if we do aim to avoid wasting time with endpoint setup.
 
-The gain any real benefit, as in not setting up endpoints and SSL cert per web hook, then it needs 
+The gain any real benefit, as in not setting up endpoints and SSL certs per web hook, then it needs 
 to handle multiple distinct endpoints, so a URL prefix per webhook setup or subdomain under a wildcard SSL host needs implementing, 
-this is underway.
+this is underway!
 
 
-## SaaS - Free hosted SSL protected web hook endpoints
+## SaaS - Free hosted SSL webhook endpoints
 
 I am in process of setting up webhookproxy.com to provide free SSL web hook endpoints and proxying.
 
@@ -65,7 +64,7 @@ pickup the requests and provide responses.
 
 Plan is to also provide site verification DNS records for example using a webhook with Google Drive SDK.  
 
-Webhookproxy.com will use Linode for hosting (referral link).
+Webhookproxy.com will use Linode for hosting. 
 
 ## Configurable
 
