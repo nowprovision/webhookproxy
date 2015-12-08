@@ -15,4 +15,5 @@ type Config struct {
 	LongPollWait       time.Duration
 	Secret             string
 	FilteringEnabled   bool
+	Hostname           string
 }

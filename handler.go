@@ -131,7 +131,10 @@ func RegisterHandlers(config *Config, mux CompatMux) {
 		}
 	})
 
-	mux.HandleFunc("/webhook", handlerWebhook)
-	mux.HandleFunc("/poll", handlerPoll)
-	mux.HandleFunc("/reply", handlerReply)
+	hostname := config.Hostname
+	secret := config.Secret
+
+	mux.HandleFunc(hostname+"/webhook/"+secret, handlerWebhook)
+	mux.HandleFunc(hostname+"/poll/"+secret, handlerPoll)
+	mux.HandleFunc(hostname+"/reply"+secret, handlerReply)
 }
