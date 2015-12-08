@@ -10,7 +10,7 @@ func RegisterHandlers(config *Config, mux CompatMux) {
 	incomingQueue := make(chan *Session, config.BackQueueSize)
 	sessionMap := make(map[string]*Session)
 
-	handlerWebhook := Protect(config.WebhookWhiteList, func(w http.ResponseWriter, r *http.Request) {
+	handlerWebhook := Protect(config.WebhookFilters, func(w http.ResponseWriter, r *http.Request) {
 
 		log.Printf("Web hook call received from %s to %s", r.RemoteAddr, r.URL)
 		session := NewSession(&w, r)
@@ -55,7 +55,7 @@ func RegisterHandlers(config *Config, mux CompatMux) {
 		}
 	})
 
-	handlerPoll := Protect(config.PollReplyWhiteList, func(w http.ResponseWriter, r *http.Request) {
+	handlerPoll := Protect(config.PollReplyFilters, func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Poll client connected from %s to %s. Waiting for a web hook", r.RemoteAddr, r.URL)
 		select {
 		case payload := <-incomingQueue:
@@ -90,7 +90,7 @@ func RegisterHandlers(config *Config, mux CompatMux) {
 		}
 	})
 
-	handlerReply := Protect(config.PollReplyWhiteList, func(w http.ResponseWriter, r *http.Request) {
+	handlerReply := Protect(config.PollReplyFilters, func(w http.ResponseWriter, r *http.Request) {
 
 		log.Printf("Call received to /reply from %s", r.RemoteAddr)
 

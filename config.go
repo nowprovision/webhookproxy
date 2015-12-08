@@ -7,8 +7,8 @@ type Config struct {
 	ShowDebugInfo      bool
 	BackQueueSize      int
 	MaxWaitSeconds     time.Duration
-	WebhookWhiteList   []*net.IPNet
-	PollReplyWhiteList []*net.IPNet
+	WebhookFilters     []*net.IPNet
+	PollReplyFilters   []*net.IPNet
 	MaxPayloadSize     int64
 	TryLaterStatusCode int
 	UseLongPoll        bool
