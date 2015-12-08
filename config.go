@@ -14,4 +14,5 @@ type Config struct {
 	UseLongPoll        bool
 	LongPollWait       time.Duration
 	Secret             string
+	FilteringEnabled   bool
 }
