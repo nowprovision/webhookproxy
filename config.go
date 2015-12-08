@@ -13,4 +13,5 @@ type Config struct {
 	TryLaterStatusCode int
 	UseLongPoll        bool
 	LongPollWait       time.Duration
+	Secret             string
 }
