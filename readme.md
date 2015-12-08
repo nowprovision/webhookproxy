@@ -17,7 +17,7 @@ with embedding a web server in our applications.
 
 WebHookProxy accepts web hook payloads, and then allows your application to connect as a http client to
 pick up the web hook payloads, and via another http client call return a response. It inverts the push/pull
-model.
+model. Run it yourself via [webhookproxy-single](http://www.github.com/nowprovision/webhookproxy-single) or use our upcoming free SaaS.
 
 ## How it works
 
@@ -63,13 +63,6 @@ A simple SaaS, giving you a custom subdomain proteted by a wildcard SSL certific
 pickup the requests and provide responses. 
 
 Plan is to also provide site verification DNS records for example using a webhook with Google Drive SDK.  
-
-Webhookproxy.com will use Linode for hosting. 
-
-## Configurable
-
-You can configure the handler with custom status code, error messages, and different timeouts, for
-security we can also handle IP filtering, and restrict max payload sizes.
 
 ## License
 
