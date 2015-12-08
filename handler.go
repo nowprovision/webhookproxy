@@ -5,7 +5,7 @@ import "fmt"
 import "log"
 import "net/http"
 
-func RegisterHandlers(config Config, mux CompatMux) {
+func RegisterHandlers(config *Config, mux CompatMux) {
 
 	incomingQueue := make(chan *Session, config.BackQueueSize)
 	sessionMap := make(map[string]*Session)
