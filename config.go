@@ -16,4 +16,5 @@ type Config struct {
 	Secret             string
 	FilteringEnabled   bool
 	Hostname           string
+	Id                 string
 }

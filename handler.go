@@ -5,12 +5,30 @@ import "fmt"
 import "log"
 import "net/http"
 
+type WebHookHandlers struct {
+	HookHandler  func(http.ResponseWriter, *http.Request)
+	PollHandler  func(http.ResponseWriter, *http.Request)
+	ReplyHandler func(http.ResponseWriter, *http.Request)
+}
+
 func RegisterHandlers(config *Config, mux CompatMux) {
+
+	handlers := BuildHandlers(config)
+
+	hostname := config.Hostname
+	secret := config.Secret
+	mux.HandleFunc(hostname+"/webhook/"+secret, handlers.HookHandler)
+	mux.HandleFunc(hostname+"/poll/"+secret, handlers.PollHandler)
+	mux.HandleFunc(hostname+"/reply"+secret, handlers.ReplyHandler)
+
+}
+
+func BuildHandlers(config *Config) *WebHookHandlers {
 
 	incomingQueue := make(chan *Session, config.BackQueueSize)
 	sessionMap := make(map[string]*Session)
 
-	handlerWebhook := Protect(config.WebhookFilters, func(w http.ResponseWriter, r *http.Request) {
+	handlerWebhook := Protect(config.FilteringEnabled, config.WebhookFilters, func(w http.ResponseWriter, r *http.Request) {
 
 		log.Printf("Web hook call received from %s to %s", r.RemoteAddr, r.URL)
 		session := NewSession(&w, r)
@@ -55,7 +73,7 @@ func RegisterHandlers(config *Config, mux CompatMux) {
 		}
 	})
 
-	handlerPoll := Protect(config.PollReplyFilters, func(w http.ResponseWriter, r *http.Request) {
+	handlerPoll := Protect(config.FilteringEnabled, config.PollReplyFilters, func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Poll client connected from %s to %s. Waiting for a web hook", r.RemoteAddr, r.URL)
 		select {
 		case payload := <-incomingQueue:
@@ -90,7 +108,7 @@ func RegisterHandlers(config *Config, mux CompatMux) {
 		}
 	})
 
-	handlerReply := Protect(config.PollReplyFilters, func(w http.ResponseWriter, r *http.Request) {
+	handlerReply := Protect(config.FilteringEnabled, config.PollReplyFilters, func(w http.ResponseWriter, r *http.Request) {
 
 		log.Printf("Call received to /reply from %s", r.RemoteAddr)
 
@@ -131,10 +149,5 @@ func RegisterHandlers(config *Config, mux CompatMux) {
 		}
 	})
 
-	hostname := config.Hostname
-	secret := config.Secret
-
-	mux.HandleFunc(hostname+"/webhook/"+secret, handlerWebhook)
-	mux.HandleFunc(hostname+"/poll/"+secret, handlerPoll)
-	mux.HandleFunc(hostname+"/reply"+secret, handlerReply)
+	return &WebHookHandlers{handlerWebhook, handlerPoll, handlerReply}
 }
