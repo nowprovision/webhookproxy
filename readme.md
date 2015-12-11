@@ -14,7 +14,7 @@ I used a fleeting frustration with Google Drive SDK webhooks to get used to the 
 
 ## Write clients, not servers
 
-Servers for web hooks often annoy me, you need some compute resources with a routable IP address, 
+Servers for web hooks (aka postbacks) often annoy me, you need some compute resources with a routable IP address, 
 and quite often a non self-signed SSL certificate. For development this is particuarly annoying, and even 
 though services like [localtunnel.me](http://www.localtunnel.me) ease the burden, one still needs to deal 
 with embedding a web server in our applications. 
@@ -27,18 +27,56 @@ or eventually use free hosted SaaS at [https://www.webhookproxy.com](https://www
 
 ## How it works
 
-You point the web hook callee such as Google Drive to your webhookproxy instance (e.g. set URL to http(s)://fqdn/prefix/webhook).
+You point the web hook callee such as Google Drive API postback to your webhookproxy instance such as 
+https://acmecorp.webhookproxy.com/webhook/swordfish where swordfish is a choosen secret and acmecorp
+is a choosen subdomain
 
-When the web hook callee sends a payload (e.g. new file in google drive, new transaction in paypal), webhookproxy
-accepts the HTTP request, and queues the task of reading the body of the request.
+When the web hook callee sends a payload via POST (e.g. new file in google drive, new transaction in paypal), webhookproxy
+accepts the HTTP request (but does not complete it yet), and queues the task of reading the body of the request. 
+The request is currently in limbo.
 
-Once a client connects to /poll side the requests are married up and the request payload of the web hook callee
-becomes the response to the client.
+Once a client connects to /poll/swordfish via GET side the requests are married up and the request payload of the web hook callee
+becomes the response to the client, a X-Replyid is also provides in the response headers. 
+Clients are expected to long-poll /poll/swordfish so there's also someone waiting (as webhook
+callee may timeout otherwise), for a large number of postbacks you can have several long polling client targetting
+the same endpoint..
 
-Once the client processes the payload it returns a response at /reply (using the X-ReplyTo-Id of the /poll response) 
-which is then returned to web hook callee as the response.
+Once the client processes the payload it returns a response at /reply/swordish via POST (using the X-ReplyTo-Id header with
+value provided by X-Replyid in the poll request), which is then returned to web hook callee as its response.
 
-Operating in long poll mode latency overhead is minimal, though please check the X-Whproxy-Delay HTTP header.
+Operating in long poll mode latency overhead is minimal, one can check latency overhead via the X-Whproxy-Delay HTTP header 
+on the poll request.
+
+## Better explained with cURL
+
+
+(1) -> curl -vvv -X POST -d 'Hello you have a new file' https://myfilesync.webhookproxy.com/webhook/swordfish 
+
+(2) -> curl -vvv -X GET https://myfilesync.webhookproxy.com/poll/swordfish 
+
+(2) <-
+< HTTP/1.1 200 OK
+< Connection: keep-alive
+< X-Replyid: 0a6d1ecb-e538-4bcc-accc-5d57fb0d7f84
+< X-Whdelaysecs: 0.12126
+< X-Whfrom: 127.0.0.1:33042
+< X-Whheader-Accept: */*
+< X-Whheader-Connection: close
+< X-Whheader-User-Agent: curl/7.43.0
+< X-Whheader-X-Forwarded-For: 1.1.1.1
+< 
+* Connection #0 to host myfilesync.webhookproxy.com left intact
+Hello you have a new file%
+ 
+(3) -> curl -vvv -X POST -d "File received" -H 'X-InReplyTo: 0a6d1ecb-e538-4bcc-accc-5d57fb0d7f84' https://myfilesync.webhookproxy.com/reply/swordfish 
+
+(3) <- HTTP/1.1 200 OK
+
+(1) <- HTTP/1.1 200 OK
+< Connection: keep-alive
+
+* Connection #0 to host myfilesync.webhookproxy.com left intact
+File received%
 
 ## Enterprise
 
