@@ -21,7 +21,9 @@ with embedding a web server in our applications.
 
 WebHookProxy accepts web hook payloads, and then allows your application to connect as a http client to
 pick up the web hook payloads, and via another http client call return a response. It inverts the push/pull
-model. Run it yourself via [webhookproxy-single](http://www.github.com/nowprovision/webhookproxy-single) or use our upcoming free SaaS.
+model. Run it yourself via [webhookproxy-single](http://www.github.com/nowprovision/webhookproxy-single),
+[webhookproxy-saas](http://www.github.com/nowprovision/webhookproxy-saas),
+or eventually use free hosted SaaS at [https://www.webhookproxy.com](https://www.webookproxy.com) 
 
 ## How it works
 
@@ -53,7 +55,6 @@ So Janice in accounting says it's okay..
 Webhookproxy simply inverts the push / pull notion, by proxying the streams to from the webhook to
 the http client, and back from second http call to the webhook callee as a reply. No inspection
 is done, any Content-Type are fine, any arbitary payload should work, form urlencoded, json, binary,yaml etc..
-
 
 
 ## Self-Hosting and Deployment 
