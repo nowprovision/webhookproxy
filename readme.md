@@ -49,34 +49,33 @@ on the poll request.
 
 ## Better explained with cURL
 
+    (1) -> curl -vvv -X POST -d 'Hello you have a new file' https://myfilesync.webhookproxy.com/webhook/swordfish 
 
-(1) -> curl -vvv -X POST -d 'Hello you have a new file' https://myfilesync.webhookproxy.com/webhook/swordfish 
+    (2) -> curl -vvv -X GET https://myfilesync.webhookproxy.com/poll/swordfish 
 
-(2) -> curl -vvv -X GET https://myfilesync.webhookproxy.com/poll/swordfish 
+    (2) <-
+    < HTTP/1.1 200 OK
+    < Connection: keep-alive
+    < X-Replyid: 0a6d1ecb-e538-4bcc-accc-5d57fb0d7f84
+    < X-Whdelaysecs: 0.12126
+    < X-Whfrom: 127.0.0.1:33042
+    < X-Whheader-Accept: */*
+    < X-Whheader-Connection: close
+    < X-Whheader-User-Agent: curl/7.43.0
+    < X-Whheader-X-Forwarded-For: 1.1.1.1
+    < 
+    * Connection #0 to host myfilesync.webhookproxy.com left intact
+    Hello you have a new file%
+    
+    (3) -> curl -vvv -X POST -d "File received" -H 'X-InReplyTo: 0a6d1ecb-e538-4bcc-accc-5d57fb0d7f84' https://myfilesync.webhookproxy.com/reply/swordfish 
 
-(2) <-
-< HTTP/1.1 200 OK
-< Connection: keep-alive
-< X-Replyid: 0a6d1ecb-e538-4bcc-accc-5d57fb0d7f84
-< X-Whdelaysecs: 0.12126
-< X-Whfrom: 127.0.0.1:33042
-< X-Whheader-Accept: */*
-< X-Whheader-Connection: close
-< X-Whheader-User-Agent: curl/7.43.0
-< X-Whheader-X-Forwarded-For: 1.1.1.1
-< 
-* Connection #0 to host myfilesync.webhookproxy.com left intact
-Hello you have a new file%
- 
-(3) -> curl -vvv -X POST -d "File received" -H 'X-InReplyTo: 0a6d1ecb-e538-4bcc-accc-5d57fb0d7f84' https://myfilesync.webhookproxy.com/reply/swordfish 
+    (3) <- HTTP/1.1 200 OK
 
-(3) <- HTTP/1.1 200 OK
+    (1) <- HTTP/1.1 200 OK
+    < Connection: keep-alive
 
-(1) <- HTTP/1.1 200 OK
-< Connection: keep-alive
-
-* Connection #0 to host myfilesync.webhookproxy.com left intact
-File received%
+    * Connection #0 to host myfilesync.webhookproxy.com left intact
+    File received%
 
 ## Enterprise
 
