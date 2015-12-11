@@ -80,12 +80,10 @@ func BuildHandlers(config *Config) *WebHookHandlers {
 			delay := time.Now().Sub(payload.started).Seconds()
 			log.Printf("Proxying payload %s from web hook callee to poll client", payload.id)
 			log.Printf("Proxying pickup latency %.5fs for %s", delay, payload.id)
-			w.WriteHeader(http.StatusOK)
 			w.Header().Add("X-ReplyId", payload.id)
 			for headerKey, headerValues := range payload.r.Header {
 				for _, headerValue := range headerValues {
 					prefix := "x-whheader-"
-					fmt.Println(headerKey)
 					if headerKey == "Content-Type" || headerKey == "Content-Encoding" {
 						prefix = ""
 					}
