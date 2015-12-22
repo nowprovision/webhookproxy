@@ -34,6 +34,15 @@ func BuildHandlers(config *Config) *WebHookHandlers {
 		session := NewSession(&w, r)
 
 		sessionMap[session.id] = session
+
+		if len(sessionMap) > 100 {
+			w.WriteHeader(config.TryLaterStatusCode)
+			if config.ShowDebugInfo {
+				fmt.Fprintf(w, "Too busy")
+			}
+			return
+		}
+
 		defer delete(sessionMap, session.id)
 		log.Printf("Web hook call assigned session id %s", session.id)
 
