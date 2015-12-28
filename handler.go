@@ -3,6 +3,7 @@ package webhookproxy
 import "time"
 import "fmt"
 import "log"
+import "io/ioutil"
 import "net/http"
 
 type WebHookHandlers struct {
@@ -48,6 +49,14 @@ func BuildHandlers(config *Config) *WebHookHandlers {
 
 		incomingQueue <- session
 		log.Printf("Web hook call added to incoming queue, waiting for reply")
+
+		// reply with empty if auto reply has been sent
+		if config.Autoreply {
+			session.r.Body = ioutil.NopCloser(session.r.Body)
+			req, _ := http.NewRequest("POST", "/", NewStringPayload(""))
+			go func() { session.c <- req }()
+		}
+
 		select {
 		case reply := <-session.c:
 			log.Printf("Reply received for %s, copying body", session.id)
@@ -106,7 +115,10 @@ func BuildHandlers(config *Config) *WebHookHandlers {
 			log.Printf("Proxied %d bytes from web hook to poll client for %s", written, payload.id)
 
 			if err != nil {
-				payload.errorChan <- err
+				log.Printf("Error proxying request %s : %s", payload.id, err)
+				if !(config.Autoreply) {
+					payload.errorChan <- err
+				}
 				return
 			}
 		case <-time.After(config.LongPollWait):

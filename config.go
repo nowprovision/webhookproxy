@@ -17,4 +17,5 @@ type Config struct {
 	FilteringEnabled   bool
 	Hostname           string
 	Id                 string
+	Autoreply          bool
 }

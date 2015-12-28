@@ -180,13 +180,3 @@ func LocalRequest(method string, uri string, payload io.Reader) (req *http.Reque
 	req.RemoteAddr = "127.0.0.1:53000"
 	return
 }
-
-type nopCloser struct {
-	io.Reader
-}
-
-func (nopCloser) Close() error { return nil }
-
-func NewStringPayload(payload string) io.ReadCloser {
-	return &nopCloser{bytes.NewBufferString(payload)}
-}
