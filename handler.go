@@ -1,6 +1,7 @@
 package webhookproxy
 
 import "time"
+import "bytes"
 import "fmt"
 import "log"
 import "io/ioutil"
@@ -52,7 +53,8 @@ func BuildHandlers(config *Config) *WebHookHandlers {
 
 		// reply with empty if auto reply has been sent
 		if config.Autoreply {
-			session.r.Body = ioutil.NopCloser(session.r.Body)
+			readbytes, _ := ioutil.ReadAll(session.r.Body)
+			session.r.Body = ioutil.NopCloser(bytes.NewReader(readbytes))
 			req, _ := http.NewRequest("POST", "/", NewStringPayload(""))
 			go func() { session.c <- req }()
 		}
@@ -93,6 +95,7 @@ func BuildHandlers(config *Config) *WebHookHandlers {
 
 	handlerPoll := Protect(config.FilteringEnabled, config.PollReplyFilters, func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Poll client connected from %s to %s. Waiting for a web hook", r.RemoteAddr, r.URL)
+		notify := w.(http.CloseNotifier).CloseNotify()
 		select {
 		case payload := <-incomingQueue:
 			delay := time.Now().Sub(payload.started).Seconds()
@@ -121,6 +124,8 @@ func BuildHandlers(config *Config) *WebHookHandlers {
 				}
 				return
 			}
+		case <-notify:
+			log.Printf("Poll client disconnected from %s to %s. Waiting for a web hook", r.RemoteAddr, r.URL)
 		case <-time.After(config.LongPollWait):
 			log.Println("No web hook waiting after %s duration", config.LongPollWait)
 			w.WriteHeader(http.StatusNoContent)
