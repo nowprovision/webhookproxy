@@ -37,7 +37,7 @@ func BuildHandlers(config *Config) *WebHookHandlers {
 
 		sessionMap[session.id] = session
 
-		if len(sessionMap) > 100 {
+		if len(sessionMap) > 50 {
 			w.WriteHeader(config.TryLaterStatusCode)
 			if config.ShowDebugInfo {
 				fmt.Fprintf(w, "Too busy")
@@ -53,10 +53,16 @@ func BuildHandlers(config *Config) *WebHookHandlers {
 
 		// reply with empty if auto reply has been sent
 		if config.Autoreply {
-			readbytes, _ := ioutil.ReadAll(session.r.Body)
-			session.r.Body = ioutil.NopCloser(bytes.NewReader(readbytes))
-			req, _ := http.NewRequest("POST", "/", NewStringPayload(""))
-			go func() { session.c <- req }()
+
+			bytesBuffer := bytes.NewBuffer([]byte{})
+			_, err := CopyMax(config.MaxPayloadSize, bytesBuffer, session.r.Body)
+			if err != nil {
+				session.errorChan <- err
+			} else {
+				session.r.Body = ioutil.NopCloser(bytesBuffer)
+				req, _ := http.NewRequest("POST", "/", NewStringPayload(""))
+				go func() { session.c <- req }()
+			}
 		}
 
 		select {

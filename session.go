@@ -17,7 +17,7 @@ type Session struct {
 func NewSession(w *http.ResponseWriter, r *http.Request) *Session {
 	id := uuid.NewV4().String()
 	resultChannel := make(chan *http.Request)
-	errorChannel := make(chan error)
+	errorChannel := make(chan error, 1)
 	okChannel := make(chan bool, 1)
 	started := time.Now()
 	return &Session{id, w, r, resultChannel, errorChannel, okChannel, started}
