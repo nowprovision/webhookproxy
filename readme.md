@@ -1,11 +1,13 @@
 # WebHookProxy
 
+** This is no longer maintained/supported, be aware race conditions are highly likely to exist in this code **
+
 ## Introduction
 
 This is the core webhookproxy library providing an inversion of push/pull model of webhooks.
 
-This works in conjuction with [webhookproxy-saas](http://www.github.com/nowprovision/webhookproxy-saas) and
-[webhookproxyweb](http://www.github.com/nowprovision/webhookproxyweb), all open source.
+This works in conjuction with webhookproxy-saas and
+webhookproxyweb, all open source.
 
 # Motivation
 
@@ -21,9 +23,9 @@ with embedding a web server in our applications.
 
 WebHookProxy accepts web hook payloads, and then allows your application to connect as a http client to
 pick up the web hook payloads, and via another http client call return a response. It inverts the push/pull
-model. Run it yourself via [webhookproxy-single](http://www.github.com/nowprovision/webhookproxy-single),
-[webhookproxy-saas](http://www.github.com/nowprovision/webhookproxy-saas),
-or eventually use free hosted SaaS at [https://www.webhookproxy.com](https://www.webookproxy.com) 
+model. Run it yourself via webhookproxy-single,
+webhookproxy-saas,
+or eventually use free hosted SaaS.
 
 ## How it works
 
@@ -96,16 +98,15 @@ is done, any Content-Type are fine, any arbitary payload should work, form urlen
 
 ## Self-Hosting and Deployment 
 
-The project [webhookproxy-single](http://www.github.com/nowprovision/webhookproxy-single) is a very simple host, as suggested by the name it only supports one
+The project webhookproxy-single is a very simple host, as suggested by the name it only supports one
 webhook configuration, which is kind of defeating the point if we do aim to avoid wasting time with endpoint setup.
 
 The gain any real benefit, as in not setting up endpoints and SSL certs per web hook, then it needs 
-to handle multiple distinct endpoints, so a URL prefix per webhook setup or subdomain under a wildcard SSL host needs implementing,
-[webhookproxy-saas](http://www.github.com/nowprovision/webhookproxy-saas) provides a Saas implementation.
+to handle multiple distinct endpoints, so a URL prefix per webhook setup or subdomain under a wildcard SSL host needs implementing,webhookproxy-saas provides a Saas implementation.
 
 ## SaaS - Free hosted SSL webhook endpoints
 
-I am in process of setting up [https://www.webhookproxy.com](https://www.webhookproxy.com) to provide free SSL web hook endpoints and proxying.
+I am in process of setting up SaaS to provide free SSL web hook endpoints and proxying.
 
 A simple SaaS, giving you a custom subdomain proteted by a wildcard SSL certificate, letting you call to 
 pickup the requests and provide responses. 
@@ -125,8 +126,4 @@ PR, code review, suggestions etc.. welcome, full credit will be given.
 ## License
 
 MIT
-
-## Author
-
-Matt Freeman - [@nowprovision](http://www.twitter.com/nowprovision)
 
